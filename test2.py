@@ -2,7 +2,7 @@ import arcpy, cPickle
 from collections import defaultdict
 
 path = 'F:\\data\\FL\\FL.gdb\\'
-routes = "routes_subset"
+routes = "routes_no0"
 OD_pair_dict = defaultdict(dict)
 
 
@@ -12,7 +12,7 @@ arcpy.MakeFeatureLayer_management(path + routes, route_lyr)
 for row in arcpy.da.SearchCursor(path + routes, ["OID@", "Name", "Gravity"]):
    s = str(row[1]).split("-")
    s1 = [x.split('Location') for x in s]
-   #OD_pair_dict[int(s1[0][1])][int(s1[1][1])] = int(row[2])
+   OD_pair_dict[int(s1[0][1])][int(s1[1][1])] = int(row[2])
    arcpy.SelectLayerByAttribute_management(route_lyr, 'NEW_SELECTION', '"OBJECTID" = '+ str(row[0]))
    with arcpy.da.UpdateCursor(route_lyr, ["origin", "destination"]) as cursor:
       for row2 in cursor:
@@ -20,9 +20,9 @@ for row in arcpy.da.SearchCursor(path + routes, ["OID@", "Name", "Gravity"]):
          row2[1] = int(s1[1][1])
          cursor.updateRow(row2)
 
-##ff = open("F:\\Dropbox\\research\\DFRLM\\data\\FL\\OD_pairs.txt",'w')
-##cPickle.dump(OD_pair_dict, ff)
-##ff.close()
+ff = open("F:\\Dropbox\\research\\DFRLM\\data\\FL\\OD_pairs.txt",'w')
+cPickle.dump(OD_pair_dict, ff)
+ff.close()
 
 
 arcs = "Arcs"
